@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ImportGiovana - Extratos Sicredi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -28,72 +28,105 @@
         .upload-section input { display: none; }
 
         .toolbar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 12px 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 5px solid var(--laranja); }
+        .toolbar-actions { display: flex; gap: 10px; }
         .checkbox-group { display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--azul-escuro); cursor: pointer; }
         .checkbox-group input { width: 18px; height: 18px; cursor: pointer; }
-        .btn { padding: 10px 20px; border: none; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: white; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: white; transition: 0.2s; }
         .btn-primary { background-color: var(--azul-escuro); } .btn-primary:hover { background-color: #055c96; }
+        .btn-warning { background-color: var(--laranja); } .btn-warning:hover { background-color: #e09328; }
 
         .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
         .card { background: white; border-radius: 8px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid var(--azul-claro); box-shadow: 0 3px 8px rgba(0,0,0,0.04); transition: 0.2s; }
         .card:hover { transform: translateY(-3px); border-top-color: var(--azul-escuro); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
         .card-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 15px; }
-        .card-title { font-size: 15px; font-weight: bold; color: var(--azul-escuro); margin-bottom: 3px; }
+        .card-title { font-size: 15px; font-weight: bold; color: var(--azul-escuro); margin-bottom: 3px; word-break: break-all; }
         .card-actions { display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #eee; padding-top: 10px; }
-        .btn-action { padding: 7px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; display: flex; align-items: center; gap: 5px; }
+        .btn-action { padding: 7px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-view { background-color: #fff4e6; color: var(--laranja); } .btn-view:hover { background-color: var(--laranja); color: white; }
         .btn-download { background-color: #e6f5ea; color: var(--verde); } .btn-download:hover { background-color: var(--verde); color: white; }
         .btn-delete { background-color: #fceaea; color: var(--vermelho); } .btn-delete:hover { background-color: var(--vermelho); color: white; }
 
-        /* ================= MODAL DE VISUALIZAÇÃO ================= */
-        .modal-overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); overflow-y: auto; padding: 30px 0; }
-        .modal-container { background-color: transparent; max-width: 800px; margin: 0 auto; position: relative; display: flex; justify-content: center; }
-        .close-modal { position: absolute; right: -40px; top: 0; font-size: 24px; color: #fff; background: var(--vermelho); border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; z-index: 1001; }
-
-        /* ================= ÁREA DE IMPRESSÃO E QUEBRA DE PÁGINA ================= */
-        #print-container { display: none; }
-        #preview-content { display: block; width: 100%; }
+        /* ================= MODAIS ================= */
+        .modal-overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); overflow-y: auto; overflow-x: hidden; padding: 30px 0; }
+        .modal-container { background-color: transparent; max-width: 100%; margin: 0 auto; position: relative; display: flex; justify-content: center; padding: 0 15px; flex-direction: column; align-items: center; }
         
-        .page { font-family: Arial, sans-serif; font-size: 10px; line-height: 1.15; color: #000; background: #fff; width: 800px; margin: 0 auto; padding: 20px 30px; box-sizing: border-box; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+        .modal-toolbar { position: sticky; top: 0; z-index: 1005; background: #fff; padding: 10px 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; }
+        
+        .compare-container { background-color: white; max-width: 1000px; width: 95%; margin: 0 auto; border-radius: 8px; padding: 30px; position: relative; }
+        .close-modal { position: absolute; right: 15px; top: -15px; font-size: 24px; color: #fff; background: var(--vermelho); border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; z-index: 1001; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        
+        .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
+        .compare-col { border: 1px solid #eee; padding: 20px; border-radius: 8px; background: #fafafa; }
+        .diff-item { background: #fff; border-left: 4px solid var(--vermelho); padding: 10px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-size: 13px; }
+        .diff-item.receita { border-left-color: var(--verde); }
+        .summary-box { background: var(--azul-escuro); color: white; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 20px; font-weight: bold; }
+
+        /* ================= ÁREA DE IMPRESSÃO (O DOC A4) ================= */
+        #print-container { display: none; }
+        #preview-content-area { display: block; width: max-content; margin: 0 auto; max-width: 100%; overflow-x: auto; background: #fff; border-radius: 4px; }
+        
+        .page { font-family: Arial, sans-serif; font-size: 11px; line-height: 1.2; color: #000; background: #fff; width: 800px; min-width: 800px; margin: 0 auto; padding: 15px 30px; box-sizing: border-box; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
         .page-break { page-break-after: always; }
         
-        /* Divisor Visual (Mostra na tela se a página for quebrada) */
+        /* QUEBRA DE PÁGINA FIXA ENTRE RECEITAS E DÉBITOS */
+        .quebra-pagina { page-break-before: always; break-before: page; margin-top: 15px; }
         .page-divider { display: none; text-align: center; margin: 25px 0 15px 0; position: relative; }
         .page-divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; border-top: 1px dashed #ccc; z-index: 1; }
         .page-divider span { background: #fff; padding: 0 15px; position: relative; z-index: 2; color: #999; font-style: italic; font-size: 11px; }
+        .quebra-pagina .page-divider { display: block; } /* Mostra na tela de visão */
 
-        /* Classe que força a quebra de página */
-        .force-break { page-break-before: always; break-before: page; }
-        .force-break .page-divider { display: block; } /* Ativa o tracejado no visualizador */
-
-        .dotted-line { display: flex; align-items: baseline; margin-bottom: 3px; }
+        .dotted-line { display: flex; align-items: baseline; margin-bottom: 2px; }
         .dotted-line span.label { white-space: nowrap; font-weight: bold; color: #111; }
         .dotted-line span.dots { flex-grow: 1; border-bottom: 1px dotted #999; margin: 0 5px; }
         
-        .month-title { font-weight: bold; font-size: 13px; margin-bottom: 10px; color: #111; text-transform: uppercase; }
-        .section-title { color: white; font-weight: bold; font-size: 11px; margin-top: 15px; margin-bottom: 3px; padding: 4px 6px; text-transform: uppercase; }
+        .month-title { font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #111; text-transform: uppercase; }
+        .section-title { color: white; font-weight: bold; font-size: 12px; margin-top: 10px; margin-bottom: 2px; padding: 3px 6px; text-transform: uppercase; page-break-after: avoid; }
+        .sub-section { font-weight: bold; color: #111; margin-top: 8px; margin-bottom: 2px; padding-left: 5px; border-left: 3px solid var(--laranja); font-size: 11.5px; }
         .bg-verde { background-color: var(--verde); } .bg-vermelho { background-color: var(--vermelho); }
         
-        table { width: 100%; border-collapse: collapse; margin-bottom: 3px; }
-        th, td { border: 1px solid #ccc; padding: 4px; vertical-align: middle; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 2px; page-break-inside: auto; }
+        tr { page-break-inside: avoid; page-break-after: auto; }
+        th, td { border: 1px solid #ccc; padding: 3px 4px; vertical-align: middle; }
         th { background-color: #eaeaea; color: #111; font-weight: bold; text-align: left; }
         tbody tr:nth-child(even) { background-color: #fcfcfc; }
         
-        .col-data { width: 65px; text-align: center; } 
+        .col-data { width: 70px; text-align: center; } 
         .col-desc { width: auto; } 
-        .col-doc { width: 75px; text-align: center; } 
-        .col-valor { width: 85px; text-align: right; font-weight: bold; } 
-        .col-saldo { width: 85px; text-align: right; font-weight: bold; color: #444; }
+        .col-doc { width: 70px; text-align: center; } 
+        .col-valor { width: 80px; text-align: right; font-weight: bold; } 
+        .col-saldo { width: 80px; text-align: right; font-weight: bold; color: #444; }
         
-        .total-row { display: flex; justify-content: flex-end; margin-top: 0; margin-bottom: 6px; background-color: #eaeaea; padding: 4px 6px; border: 1px solid #ccc; border-top: none; font-weight: bold; color: #111; }
-        .total-row span.label { margin-right: 20px; text-transform: uppercase; }
-        .final-totals { margin-top: 15px; padding: 12px; border: 2px solid #2c3e50; background-color: #f8f9fa; border-radius: 4px; }
+        /* ESTILO DA COLUNA EDITÁVEL DE OBSERVAÇÕES */
+        .col-obs { width: 130px; min-width: 130px; color: #111; } 
+        .col-obs[contenteditable="true"] { cursor: text; background-color: #fefce8; border-bottom: 1px dashed #ccc; transition: 0.2s; outline: none; }
+        .col-obs[contenteditable="true"]:focus { background-color: #fff; border: 1px solid var(--azul-claro); }
+        .col-obs[contenteditable="true"]:empty:before { content: "Clicar p/ digitar..."; color: #aaa; font-style: italic; }
 
-        /* Remove o traço divisor na hora de exportar para PDF */
+        .total-row { display: flex; justify-content: flex-end; margin-top: 0; margin-bottom: 8px; background-color: #eaeaea; padding: 4px 6px; border: 1px solid #ccc; border-top: none; font-weight: bold; color: #111; page-break-before: avoid; font-size: 11px; }
+        .total-row span.label { margin-right: 20px; text-transform: uppercase; }
+        
+        .final-totals { margin-top: 12px; padding: 10px; border: 2px solid #2c3e50; background-color: #f8f9fa; border-radius: 4px; page-break-inside: avoid; }
+
+        @media screen and (max-width: 768px) {
+            .topbar { flex-direction: column; padding: 15px; text-align: center; gap: 8px; }
+            .toolbar { flex-direction: column; align-items: stretch; gap: 15px; padding: 15px; }
+            .toolbar-actions { flex-direction: column; width: 100%; }
+            .toolbar-actions .btn { width: 100%; justify-content: center; padding: 12px; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .card-actions { flex-wrap: wrap; }
+            .btn-action { flex: 1 1 30%; font-size: 11px; padding: 8px 5px; }
+            #preview-content-area { max-width: 100%; border-radius: 0; }
+            .modal-toolbar { flex-direction: column; }
+        }
+
+        /* REGRAS DE IMPRESSÃO */
         @media print {
             body { background-color: #fff; margin: 0; padding: 0; }
             .dashboard-ui, .modal-overlay, .page-divider { display: none !important; } 
             #print-container { display: block !important; } 
-            .page { width: 100%; max-width: 100%; padding: 0; margin: 0; box-shadow: none; border: none; }
+            .page { width: 100%; max-width: 100%; padding: 0; margin: 0; box-shadow: none; border: none; min-width: auto; }
+            .col-obs[contenteditable="true"] { background: transparent !important; border: none !important; }
+            .col-obs[contenteditable="true"]:empty:before { content: "" !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
     </style>
@@ -109,21 +142,28 @@
         <label class="upload-section" for="file-upload">
             <i class="fa-solid fa-file-arrow-up"></i>
             <h3>Importar Extrato Sicredi</h3>
-            <p>Selecione os PDFs. O sistema quebra a folha automaticamente se o extrato for muito grande.</p>
+            <p>COMPRAS vão direto para Fornecedores. Internet para Despesas Administrativas.</p>
             <input type="file" id="file-upload" accept="application/pdf" multiple>
         </label>
         <div class="toolbar">
             <label class="checkbox-group"><input type="checkbox" id="select-all"><span>Selecionar Todos</span></label>
-            <button class="btn btn-primary" onclick="printSelected()"><i class="fa-solid fa-file-pdf"></i> Baixar Selecionados</button>
+            <div class="toolbar-actions">
+                <button class="btn btn-warning" onclick="abrirComparador()"><i class="fa-solid fa-code-compare"></i> Comparar</button>
+                <button class="btn btn-primary" onclick="printSelected()"><i class="fa-solid fa-file-pdf"></i> Exportar Lote</button>
+            </div>
         </div>
-        <div class="cards-grid" id="cards-container"><p style="color: #888; text-align: center; grid-column: 1/-1;">Carregando banco de dados...</p></div>
+        <div class="cards-grid" id="cards-container"><p style="color: #888; text-align: center; grid-column: 1/-1;">A carregar banco de dados...</p></div>
     </div>
 </div>
 
 <div class="modal-overlay" id="view-modal">
     <div class="modal-container">
-        <button class="close-modal" onclick="closePreview()"><i class="fa-solid fa-xmark"></i></button>
-        <div id="preview-content"></div>
+        <div class="modal-toolbar">
+            <button class="btn btn-primary" onclick="salvarEdicoes()" style="background: var(--azul-escuro);"><i class="fa-solid fa-floppy-disk"></i> Salvar Observações</button>
+            <button class="btn btn-primary" onclick="printEditedModal()" style="background: var(--verde);"><i class="fa-solid fa-print"></i> Salvar / Imprimir PDF</button>
+            <button class="btn btn-primary" onclick="closeModal('view-modal')" style="background: var(--vermelho);"><i class="fa-solid fa-xmark"></i> Fechar</button>
+        </div>
+        <div id="preview-content-area"></div>
     </div>
 </div>
 
@@ -131,34 +171,54 @@
 
 <template id="report-template">
     <div class="page page-break">
-        <div class="container-receitas">
-            <div class="month-title tpl-mes">MÊS/ANO</div>
-            
-            <div class="dotted-line"><span class="label">Capital Social</span><span class="dots"></span><span class="value">R$ 0,00</span></div>
-            <div class="dotted-line"><span class="label">Conta Corrente Sicredi Inicial</span><span class="dots"></span><span class="value tpl-conta-corrente">R$ 0,00</span></div>
+        <div class="month-title tpl-mes">MÊS/ANO</div>
+        
+        <div class="dotted-line"><span class="label">Capital Social</span><span class="dots"></span><span class="value">R$ 0,00</span></div>
+        <div class="dotted-line"><span class="label">Conta Corrente Sicredi Inicial</span><span class="dots"></span><span class="value tpl-conta-corrente">R$ 0,00</span></div>
 
-            <div class="section-title bg-verde">RECEITAS</div>
-            <table>
-                <thead><tr><th class="col-data">Data</th><th class="col-desc">Descrição</th><th class="col-doc">Documento</th><th class="col-valor">Valor</th><th class="col-saldo">Saldo (R$)</th></tr></thead>
-                <tbody id="tbl-receitas"></tbody>
-            </table>
-            <div class="total-row"><span class="label">Total Receitas</span><span class="tpl-total-receitas" style="color: var(--verde);">0,00</span></div>
-        </div>
+        <div class="section-title bg-verde">RECEITAS</div>
+        <table>
+            <thead><tr><th class="col-data">Data</th><th class="col-desc">Descrição</th><th class="col-doc">Doc.</th><th class="col-valor">Valor</th><th class="col-saldo">Saldo (R$)</th><th class="col-obs">Observações</th></tr></thead>
+            <tbody id="tbl-receitas"></tbody>
+        </table>
+        <div class="total-row"><span class="label">Total Receitas</span><span class="tpl-total-receitas" style="color: var(--verde);">0,00</span></div>
 
-        <div class="container-debitos">
-            <div class="page-divider"><span>Página Seguinte</span></div>
-
+        <div class="quebra-pagina">
+            <div class="page-divider"><span>Início da Página 2</span></div>
             <div class="section-title bg-vermelho">DÉBITOS</div>
+            
+            <div class="sub-section">Serviços essenciais</div>
             <table>
-                <thead><tr><th class="col-data">Data</th><th class="col-desc">Descrição</th><th class="col-doc">Documento</th><th class="col-valor">Valor</th><th class="col-saldo">Saldo (R$)</th></tr></thead>
-                <tbody id="tbl-debitos"></tbody>
+                <thead><tr><th class="col-data">Data</th><th class="col-desc">Descrição</th><th class="col-doc">Doc.</th><th class="col-valor">Valor</th><th class="col-saldo">Saldo (R$)</th><th class="col-obs">Observações</th></tr></thead>
+                <tbody id="tbl-essenciais"></tbody>
             </table>
-            <div class="total-row"><span class="label">Total Débitos</span><span class="tpl-total-debitos" style="color: var(--vermelho);">0,00</span></div>
+            <div class="total-row"><span class="label">Total Essenciais</span><span class="tpl-total-essenciais">0,00</span></div>
+
+            <div class="sub-section">Despesas administrativas</div>
+            <table>
+                <thead><tr><th class="col-data">Data</th><th class="col-desc">Descrição</th><th class="col-doc">Doc.</th><th class="col-valor">Valor</th><th class="col-saldo">Saldo (R$)</th><th class="col-obs">Observações</th></tr></thead>
+                <tbody id="tbl-administrativas"></tbody>
+            </table>
+            <div class="total-row"><span class="label">Total Administrativas</span><span class="tpl-total-admin">0,00</span></div>
+
+            <div class="sub-section">Prestadores de Serviço</div>
+            <table>
+                <thead><tr><th class="col-data">Data</th><th class="col-desc">Descrição</th><th class="col-doc">Doc.</th><th class="col-valor">Valor</th><th class="col-saldo">Saldo (R$)</th><th class="col-obs">Observações</th></tr></thead>
+                <tbody id="tbl-prestadores"></tbody>
+            </table>
+            <div class="total-row"><span class="label">Total Prestadores</span><span class="tpl-total-prestadores">0,00</span></div>
+
+            <div class="sub-section">Fornecedores</div>
+            <table>
+                <thead><tr><th class="col-data">Data</th><th class="col-desc">Descrição</th><th class="col-doc">Doc.</th><th class="col-valor">Valor</th><th class="col-saldo">Saldo (R$)</th><th class="col-obs">Observações</th></tr></thead>
+                <tbody id="tbl-fornecedores"></tbody>
+            </table>
+            <div class="total-row"><span class="label">Total Fornecedores</span><span class="tpl-total-fornecedores">0,00</span></div>
 
             <div class="final-totals">
                 <div class="dotted-line"><span class="label">Total de receitas do período</span><span class="dots"></span><span class="value tpl-total-receitas" style="color: var(--verde);">R$ 0,00</span></div>
                 <div class="dotted-line"><span class="label">Total de débitos do período</span><span class="dots"></span><span class="value tpl-total-debitos" style="color: var(--vermelho);">R$ 0,00</span></div>
-                <div class="dotted-line" style="margin-top: 10px; border-top: 1px solid #ccc; padding-top: 10px;"><span class="label">Balanço do Período (Receitas - Débitos)</span><span class="dots"></span><span class="value tpl-saldo-final" style="font-size: 14px; color: #111;">R$ 0,00</span></div>
+                <div class="dotted-line" style="margin-top: 8px; border-top: 1px solid #ccc; padding-top: 8px;"><span class="label">Balanço do Período (Receitas - Débitos)</span><span class="dots"></span><span class="value tpl-saldo-final" style="font-size: 13px; color: #111;">R$ 0,00</span></div>
             </div>
         </div>
     </div>
@@ -167,7 +227,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -177,6 +237,7 @@
     const extratosRef = ref(db, 'extratos_gerados');
 
     window.extratosPendentes = []; 
+    window.currentEditingKey = null; // Memória de qual extrato está aberto no modal
 
     onValue(extratosRef, (snapshot) => {
         const container = document.getElementById('cards-container');
@@ -211,11 +272,8 @@
                 let txtLimpo = rawText.replace(/\s+/g, ' ');
 
                 let dados = {
-                    titulo: "Extrato",
-                    fileName: file.name,
-                    contaCorrente: "0,00",
-                    receitas: [], 
-                    debitos: []
+                    titulo: "Extrato", fileName: file.name, contaCorrente: "0,00", 
+                    receitas: [], essenciais: [], administrativas: [], prestadores: [], fornecedores: []
                 };
 
                 let mPeriodo = txtLimpo.match(/Período de ([\d\/]+\s*a\s*[\d\/]+)/i);
@@ -232,7 +290,6 @@
                     if(!matchData) continue;
                     
                     let dataStr = matchData[1];
-
                     let regexValores = /-?\d{1,3}(?:\.\d{3})*,\d{2}/g;
                     let matchesMonetarios = linha.match(regexValores);
                     
@@ -245,26 +302,42 @@
                         
                         let partesMiolo = miolo.split(' ');
                         let docStr = '-';
+                        if (/\d/.test(partesMiolo[partesMiolo.length - 1])) { docStr = partesMiolo.pop(); }
                         
-                        let provavelDoc = partesMiolo[partesMiolo.length - 1];
-                        if (/\d/.test(provavelDoc)) {
-                            docStr = partesMiolo.pop();
-                        }
-                        
-                        let descStr = partesMiolo.join(' ');
+                        let descStr = partesMiolo.join(' ').substring(0,50);
                         let isDebito = valorTransacaoStr.includes('-');
                         let valorLimpo = valorTransacaoStr.replace('-', ''); 
 
-                        let transacao = {
-                            data: dataStr, 
-                            desc: descStr.substring(0,50), 
-                            doc: docStr, 
-                            valor: valorLimpo, 
-                            saldo: saldoCaixaStr
-                        };
+                        let transacao = { data: dataStr, desc: descStr, doc: docStr, valor: valorLimpo, saldo: saldoCaixaStr, obs: "" };
 
+                        // LÓGICA DE CATEGORIZAÇÃO (Cébero Corrigido com "COMPRAS")
                         if (isDebito) {
-                            dados.debitos.push(transacao);
+                            let descUpper = descStr.toUpperCase();
+                            let isPrestador = false;
+                            
+                            // 1. PRIORIDADE MÁXIMA: Termos explícitos e Taxas
+                            if (/INTERNET|IOF|JUROS|TAR\b|CESTA|DOC\/TED|TAXA|MANUTENCAO|MENSALIDADE|TARIFA/i.test(descUpper)) {
+                                dados.administrativas.push(transacao);
+                            } 
+                            else if (/SANEPAR|COPEL|TIM\b|VIVO|CLARO|AGUA|ENERGIA|LUZ|TELEFONE/i.test(descUpper)) {
+                                dados.essenciais.push(transacao);
+                            }
+                            // 2. PRIORIDADE ESPECIAL: COMPRAS (Vai direto para fornecedores)
+                            else if (/COMPRAS/i.test(descUpper)) {
+                                dados.fornecedores.push(transacao);
+                            }
+                            // 3. PRESTADORES DE SERVIÇO (Tem CPF, ou é TED/DOC p/ pessoa física)
+                            else if (
+                                /\b\d{11}\b/.test(descUpper) || 
+                                (/(TED|DOC)/i.test(descUpper) && !/(LTDA|ME\b|MEI\b|S\.A\.|S\/A|COMERCIO|BOLETO|PAGAMENTO|PAG|CONVENIO)/i.test(descUpper)) ||
+                                /CONTADOR|HONORARIO|ADVOCACIA|SERVICO/i.test(descUpper)
+                            ) {
+                                dados.prestadores.push(transacao);
+                            } 
+                            // 4. O QUE SOBRAR: Fornecedores
+                            else {
+                                dados.fornecedores.push(transacao);
+                            }
                         } else {
                             dados.receitas.push(transacao);
                         }
@@ -288,7 +361,7 @@
             <div>
                 <div class="card-header">
                     <input type="checkbox" class="card-checkbox" value="${data.firebaseKey}">
-                    <div>
+                    <div style="max-width: 90%;">
                         <div class="card-title">${data.titulo}</div>
                         <div class="card-subtitle"><i class="fa-solid fa-file-pdf"></i> Original: ${data.fileName}</div>
                     </div>
@@ -296,8 +369,8 @@
             </div>
             <div class="card-actions">
                 <button class="btn-action btn-delete" onclick="deletarCard('${data.firebaseKey}')" title="Apagar"><i class="fa-solid fa-trash"></i></button>
-                <button class="btn-action btn-view" onclick="openPreview('${data.firebaseKey}')" title="Apenas Visualizar"><i class="fa-solid fa-eye"></i> Visão</button>
-                <button class="btn-action btn-download" onclick="printSingle('${data.firebaseKey}')" title="Exportar PDF"><i class="fa-solid fa-print"></i> PDF</button>
+                <button class="btn-action btn-view" onclick="openPreview('${data.firebaseKey}')" title="Abrir e Editar"><i class="fa-solid fa-pen-to-square"></i> Visão</button>
+                <button class="btn-action btn-download" onclick="printSingle('${data.firebaseKey}')" title="Exportar PDF Rápido"><i class="fa-solid fa-print"></i> PDF</button>
             </div>
         `;
         document.getElementById('cards-container').appendChild(div);
@@ -307,80 +380,123 @@
         document.querySelectorAll('.card-checkbox').forEach(cb => cb.checked = e.target.checked);
     });
 
+    window.closeModal = function(id) { 
+        document.getElementById(id).style.display = 'none'; 
+        window.currentEditingKey = null;
+    };
+
+    // Abre o Modal com Edição e Guarda a Chave do Extrato
     window.openPreview = function(key) {
+        window.currentEditingKey = key;
         const data = window.extratosPendentes.find(d => d.firebaseKey === key);
         if(data) {
-            const previewContent = document.getElementById('preview-content');
-            previewContent.innerHTML = ''; 
-            gerarDocumentos(data, previewContent); 
+            const tempDiv = document.createElement('div');
+            gerarDocumentos(data, tempDiv); 
+            document.getElementById('preview-content-area').innerHTML = tempDiv.innerHTML;
             document.getElementById('view-modal').style.display = 'block';
         }
     };
-    window.closePreview = function() { document.getElementById('view-modal').style.display = 'none'; };
+
+    // SALVA AS OBSERVAÇÕES ESCRITAS NA TELA DIRETAMENTE NO FIREBASE
+    window.salvarEdicoes = function() {
+        if(!window.currentEditingKey) return;
+        const data = window.extratosPendentes.find(d => d.firebaseKey === window.currentEditingKey);
+        if(!data) return;
+
+        // Função que varre o HTML editado e atualiza o objeto Javascript
+        const updateTableData = (tableId, arr) => {
+            const rows = document.querySelectorAll(`#preview-content-area #${tableId} tr`);
+            if(arr && arr.length > 0) {
+                arr.forEach((item, i) => {
+                    if(rows[i]) {
+                        const obsCell = rows[i].querySelector('.col-obs');
+                        if(obsCell) item.obs = obsCell.innerText.trim();
+                    }
+                });
+            }
+        };
+
+        updateTableData('tbl-receitas', data.receitas);
+        updateTableData('tbl-essenciais', data.essenciais);
+        updateTableData('tbl-administrativas', data.administrativas);
+        updateTableData('tbl-prestadores', data.prestadores);
+        updateTableData('tbl-fornecedores', data.fornecedores);
+
+        // Prepara o objeto para salvar, removendo a chave interna
+        const dataToSave = {...data};
+        delete dataToSave.firebaseKey; 
+
+        // Salva na Nuvem
+        const refToUpdate = ref(db, 'extratos_gerados/' + window.currentEditingKey);
+        set(refToUpdate, dataToSave).then(() => {
+            alert("Observações salvas com sucesso no banco de dados!");
+        }).catch((error) => {
+            console.error(error);
+            alert("Erro ao salvar. Verifique a conexão.");
+        });
+    };
+
+    window.printEditedModal = function() {
+        document.getElementById('print-container').innerHTML = document.getElementById('preview-content-area').innerHTML;
+        window.print();
+    };
 
     window.printSingle = function(key) {
         const data = window.extratosPendentes.find(d => d.firebaseKey === key);
-        if(data) { 
-            const printContainer = document.getElementById('print-container');
-            printContainer.innerHTML = '';
-            gerarDocumentos(data, printContainer); 
-            window.print(); 
-        }
+        if(data) { document.getElementById('print-container').innerHTML = ''; gerarDocumentos(data, document.getElementById('print-container')); window.print(); }
     };
 
     window.printSelected = function() {
         const checkeds = Array.from(document.querySelectorAll('.card-checkbox:checked')).map(cb => window.extratosPendentes.find(d => d.firebaseKey === cb.value));
         if(checkeds.length === 0) return alert("Selecione pelo menos um arquivo.");
-        
-        const printContainer = document.getElementById('print-container');
-        printContainer.innerHTML = '';
-        checkeds.forEach(data => gerarDocumentos(data, printContainer, true)); 
+        document.getElementById('print-container').innerHTML = '';
+        checkeds.forEach(data => gerarDocumentos(data, document.getElementById('print-container'), true)); 
         window.print(); 
     };
 
     function somarCategoria(arr) {
         if (!arr || arr.length === 0) return 0;
-        return arr.reduce((acc, curr) => {
-            let val = parseFloat(curr.valor.replace(/\./g, '').replace(',', '.'));
-            return acc + (isNaN(val) ? 0 : val);
-        }, 0);
+        return arr.reduce((acc, curr) => { let val = parseFloat(curr.valor.replace(/\./g, '').replace(',', '.')); return acc + (isNaN(val) ? 0 : val); }, 0);
     }
 
     function format(num) { return num.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
 
-    function gerarDocumentos(data, containerAlvo, concatenar = false) {
+    function gerarDocumentos(data, containerAlvo) {
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = document.getElementById('report-template').innerHTML;
         
         tempDiv.querySelector('.tpl-mes').innerText = data.titulo;
         tempDiv.querySelector('.tpl-conta-corrente').innerText = `R$ ${data.contaCorrente}`;
 
-        // ==========================================
-        // SENSOR DE TAMANHO (Quebra de Página)
-        // ==========================================
-        const LIMITE_LINHAS = 15;
-        const totalLinhas = (data.receitas ? data.receitas.length : 0) + (data.debitos ? data.debitos.length : 0);
+        const tRec = somarCategoria(data.receitas);
+        const tEss = somarCategoria(data.essenciais);
+        const tAdm = somarCategoria(data.administrativas);
+        const tPre = somarCategoria(data.prestadores);
+        const tFor = somarCategoria(data.fornecedores);
         
-        if (totalLinhas > LIMITE_LINHAS) {
-            // Adiciona a classe que força a tabela de débitos ir para a página 2
-            tempDiv.querySelector('.container-debitos').classList.add('force-break');
-        }
+        const totalDebitos = tEss + tAdm + tPre + tFor;
+        const saldoFinal = tRec - totalDebitos;
 
-        const totalReceitas = somarCategoria(data.receitas);
-        const totalDebitos = somarCategoria(data.debitos);
-        const saldoFinal = totalReceitas - totalDebitos;
-
-        tempDiv.querySelectorAll('.tpl-total-receitas').forEach(el => el.innerText = format(totalReceitas));
+        tempDiv.querySelectorAll('.tpl-total-receitas').forEach(el => el.innerText = format(tRec));
+        tempDiv.querySelector('.tpl-total-essenciais').innerText = format(tEss);
+        tempDiv.querySelector('.tpl-total-admin').innerText = format(tAdm);
+        tempDiv.querySelector('.tpl-total-prestadores').innerText = format(tPre);
+        tempDiv.querySelector('.tpl-total-fornecedores').innerText = format(tFor);
+        
         tempDiv.querySelectorAll('.tpl-total-debitos').forEach(el => el.innerText = format(totalDebitos));
         
         const saldoFinalEl = tempDiv.querySelector('.tpl-saldo-final');
         saldoFinalEl.innerText = format(saldoFinal);
         if(saldoFinal < 0) saldoFinalEl.style.color = "var(--vermelho)";
 
-        const buildRows = (arr) => arr && arr.length > 0 ? arr.map(item => `<tr><td class="col-data">${item.data}</td><td class="col-desc">${item.desc}</td><td class="col-doc">${item.doc}</td><td class="col-valor">${item.valor}</td><td class="col-saldo">${item.saldo}</td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center; color:#999; font-style:italic; font-size:10px;">Sem movimentação no período</td></tr>';
+        // O SEGREDO DO HTML5: Injetamos o item.obs se existir, caso contrário fica vazio para digitar.
+        const buildRows = (arr) => arr && arr.length > 0 ? arr.map(item => `<tr><td class="col-data">${item.data}</td><td class="col-desc">${item.desc}</td><td class="col-doc">${item.doc}</td><td class="col-valor">${item.valor}</td><td class="col-saldo">${item.saldo}</td><td class="col-obs" contenteditable="true">${item.obs || ''}</td></tr>`).join('') : '<tr><td colspan="6" style="text-align:center; color:#999; font-style:italic; font-size:11px;">Sem movimentação nesta categoria</td></tr>';
 
         tempDiv.querySelector('#tbl-receitas').innerHTML = buildRows(data.receitas);
-        tempDiv.querySelector('#tbl-debitos').innerHTML = buildRows(data.debitos);
+        tempDiv.querySelector('#tbl-essenciais').innerHTML = buildRows(data.essenciais);
+        tempDiv.querySelector('#tbl-administrativas').innerHTML = buildRows(data.administrativas);
+        tempDiv.querySelector('#tbl-prestadores').innerHTML = buildRows(data.prestadores);
+        tempDiv.querySelector('#tbl-fornecedores').innerHTML = buildRows(data.fornecedores);
 
         containerAlvo.appendChild(tempDiv.firstElementChild);
     }
