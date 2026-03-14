@@ -182,8 +182,6 @@
         <div class="month-title tpl-mes">MÊS/ANO</div>
         
         <div class="dotted-line"><span class="label">Capital Social</span><span class="dots"></span><span class="value tpl-capital-social">R$ 10.000,00</span></div>
-        <div class="dotted-line"><span class="label">Conta Corrente Sicredi Inicial</span><span class="dots"></span><span class="value tpl-conta-corrente">R$ 0,00</span></div>
-
         <div class="section-title bg-verde">RECEITAS GERAIS</div>
         <table>
             <thead><tr><th class="col-data">Data</th><th class="col-desc">Descrição</th><th class="col-doc">Doc.</th><th class="col-valor">Valor</th><th class="col-obs">Observações</th><th class="col-acoes no-print">Mover</th></tr></thead>
@@ -232,8 +230,8 @@
             <div class="total-row"><span class="label">Balanço de Sócios</span><span class="tpl-total-socios">0,00</span></div>
 
             <div class="final-totals">
-                <div class="dotted-line"><span class="label">Total de receitas do período</span><span class="dots"></span><span class="value" style="color: var(--verde);">R$ <span class="tpl-total-receitas">0,00</span></span></div>
-                <div class="dotted-line"><span class="label">Total de débitos do período</span><span class="dots"></span><span class="value" style="color: var(--vermelho);">R$ <span class="tpl-total-debitos">0,00</span></span></div>
+                <div class="dotted-line"><span class="label">Total de receitas do período (S/ Sócios)</span><span class="dots"></span><span class="value" style="color: var(--verde);">R$ <span class="tpl-total-receitas">0,00</span></span></div>
+                <div class="dotted-line"><span class="label">Total de débitos do período (S/ Sócios)</span><span class="dots"></span><span class="value" style="color: var(--vermelho);">R$ <span class="tpl-total-debitos">0,00</span></span></div>
                 <div class="dotted-line" style="margin-top: 8px; border-top: 1px solid #ccc; padding-top: 8px;"><span class="label">Balanço do Período</span><span class="dots"></span><span class="value" style="font-size: 13px; color: #111;">R$ <span class="tpl-saldo-final">0,00</span></span></div>
             </div>
         </div>
@@ -545,9 +543,6 @@
         tempDiv.innerHTML = document.getElementById('report-template').innerHTML;
         
         tempDiv.querySelector('.tpl-mes').innerText = data.titulo;
-        
-        tempDiv.querySelector('.tpl-capital-social').innerText = "R$ 10.000,00";
-        tempDiv.querySelector('.tpl-conta-corrente').innerText = `R$ ${data.contaCorrente}`;
 
         const tRec = somarCategoria(data.receitas);
         const tEss = somarCategoria(data.essenciais);
@@ -560,22 +555,20 @@
         const saldoFinal = tRec - totalDebitos + tSoc;
 
         tempDiv.querySelectorAll('.tpl-total-receitas').forEach(el => el.innerText = format(tRec));
+        tempDiv.querySelectorAll('.tpl-total-debitos').forEach(el => el.innerText = format(totalDebitos));
         
         tempDiv.querySelector('.tpl-total-essenciais').innerText = format(tEss);
         tempDiv.querySelector('.tpl-total-admin').innerText = format(tAdm);
         tempDiv.querySelector('.tpl-total-prestadores').innerText = format(tPre);
         tempDiv.querySelector('.tpl-total-fornecedores').innerText = format(tFor);
         
-        tempDiv.querySelector('.tpl-total-socios').innerText = format(tSoc);
-        
-        tempDiv.querySelectorAll('.tpl-total-debitos').forEach(el => el.innerText = format(totalDebitos));
-        
-        const saldoFinalEl = tempDiv.querySelector('.tpl-saldo-final').parentElement;
-        tempDiv.querySelector('.tpl-saldo-final').innerText = format(saldoFinal);
-        if(saldoFinal < 0) saldoFinalEl.style.color = "var(--vermelho)"; else saldoFinalEl.style.color = "#111";
-        
         const tplSocEl = tempDiv.querySelector('.tpl-total-socios');
-        if(tSoc < 0) tplSocEl.style.color = "var(--vermelho)"; else tplSocEl.style.color = "var(--azul-escuro)";
+        tplSocEl.innerText = format(tSoc);
+        if(tSoc < 0) tplSocEl.parentElement.style.color = "var(--vermelho)"; else tplSocEl.parentElement.style.color = "var(--azul-escuro)";
+        
+        const saldoFinalEl = tempDiv.querySelector('.tpl-saldo-final');
+        saldoFinalEl.innerText = format(saldoFinal);
+        if(saldoFinal < 0) saldoFinalEl.parentElement.style.color = "var(--vermelho)"; else saldoFinalEl.parentElement.style.color = "#111";
 
         const firebaseKeyStr = data.firebaseKey || '';
         const buildRows = (arr, catName) => arr && arr.length > 0 ? arr.map((item, i) => `
