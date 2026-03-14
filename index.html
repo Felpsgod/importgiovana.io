@@ -81,7 +81,7 @@
         .month-title { font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #111; text-transform: uppercase; }
         .section-title { color: white; font-weight: bold; font-size: 12px; margin-top: 10px; margin-bottom: 2px; padding: 3px 6px; text-transform: uppercase; page-break-after: avoid; }
         .sub-section { font-weight: bold; color: #111; margin-top: 8px; margin-bottom: 2px; padding-left: 5px; border-left: 3px solid var(--laranja); font-size: 11.5px; }
-        .bg-verde { background-color: var(--verde); } .bg-vermelho { background-color: var(--vermelho); } .bg-azul { background-color: var(--azul-escuro); }
+        .bg-verde { background-color: var(--verde); } .bg-vermelho { background-color: var(--vermelho); }
         
         table { width: 100%; border-collapse: collapse; margin-bottom: 2px; page-break-inside: auto; }
         tr { page-break-inside: avoid; page-break-after: auto; transition: background-color 0.3s; }
@@ -139,7 +139,7 @@
         <label class="upload-section" for="file-upload">
             <i class="fa-solid fa-file-arrow-up"></i>
             <h3>Importar Extrato Sicredi</h3>
-            <p>O Capital Social será gerado automaticamente com R$ 10.000,00.</p>
+            <p>O Saldo Atual do rodapé é ignorado automaticamente.</p>
             <input type="file" id="file-upload" accept="application/pdf" multiple>
         </label>
         <div class="toolbar">
@@ -182,6 +182,7 @@
         <div class="month-title tpl-mes">MÊS/ANO</div>
         
         <div class="dotted-line"><span class="label">Capital Social</span><span class="dots"></span><span class="value tpl-capital-social">R$ 10.000,00</span></div>
+
         <div class="section-title bg-verde">RECEITAS GERAIS</div>
         <table>
             <thead><tr><th class="col-data">Data</th><th class="col-desc">Descrição</th><th class="col-doc">Doc.</th><th class="col-valor">Valor</th><th class="col-obs">Observações</th><th class="col-acoes no-print">Mover</th></tr></thead>
@@ -220,19 +221,11 @@
                 <tbody id="tbl-fornecedores"></tbody>
             </table>
             <div class="total-row"><span class="label">Total Fornecedores</span><span class="tpl-total-fornecedores">0,00</span></div>
-            
-            <div class="section-title bg-azul">SÓCIOS</div>
-            <div class="sub-section">Entradas e Retiradas (Balanço Pessoal)</div>
-            <table>
-                <thead><tr><th class="col-data">Data</th><th class="col-desc">Descrição</th><th class="col-doc">Doc.</th><th class="col-valor">Valor</th><th class="col-obs">Observações</th><th class="col-acoes no-print">Mover</th></tr></thead>
-                <tbody id="tbl-socios"></tbody>
-            </table>
-            <div class="total-row"><span class="label">Balanço de Sócios</span><span class="tpl-total-socios">0,00</span></div>
 
             <div class="final-totals">
-                <div class="dotted-line"><span class="label">Total de receitas do período (S/ Sócios)</span><span class="dots"></span><span class="value" style="color: var(--verde);">R$ <span class="tpl-total-receitas">0,00</span></span></div>
-                <div class="dotted-line"><span class="label">Total de débitos do período (S/ Sócios)</span><span class="dots"></span><span class="value" style="color: var(--vermelho);">R$ <span class="tpl-total-debitos">0,00</span></span></div>
-                <div class="dotted-line" style="margin-top: 8px; border-top: 1px solid #ccc; padding-top: 8px;"><span class="label">Balanço do Período</span><span class="dots"></span><span class="value" style="font-size: 13px; color: #111;">R$ <span class="tpl-saldo-final">0,00</span></span></div>
+                <div class="dotted-line"><span class="label">Total de receitas do período</span><span class="dots"></span><span class="value" style="color: var(--verde);">R$ <span class="tpl-resumo-receitas">0,00</span></span></div>
+                <div class="dotted-line"><span class="label">Total de débitos do período</span><span class="dots"></span><span class="value" style="color: var(--vermelho);">R$ <span class="tpl-resumo-debitos">0,00</span></span></div>
+                <div class="dotted-line" style="margin-top: 8px; border-top: 1px solid #ccc; padding-top: 8px;"><span class="label">Balanço do Período</span><span class="dots"></span><span class="value" style="font-size: 13px; color: #111;">R$ <span class="tpl-resumo-saldo">0,00</span></span></div>
             </div>
         </div>
     </div>
@@ -284,10 +277,12 @@
                 }
 
                 let txtLimpo = rawText.replace(/\s+/g, ' ');
+                // NOVIDADE: Corta o rodapé do extrato a partir da palavra "Saldo da conta" ou "Saldo Atual"
+                txtLimpo = txtLimpo.split(/Saldo da conta|Saldo Atual|Saldo bloqueado/i)[0];
 
                 let dados = {
                     titulo: "Extrato", fileName: file.name, contaCorrente: "0,00", capitalSocial: "10.000,00",
-                    receitas: [], essenciais: [], administrativas: [], prestadores: [], fornecedores: [], socios: []
+                    receitas: [], essenciais: [], administrativas: [], prestadores: [], fornecedores: []
                 };
 
                 let mPeriodo = txtLimpo.match(/Período de ([\d\/]+\s*a\s*[\d\/]+)/i);
@@ -322,15 +317,9 @@
                         let valorLimpo = valorTransacaoStr.replace('-', ''); 
 
                         let transacao = { data: dataStr, desc: descStr, doc: docStr, valor: valorLimpo, obs: "" };
-                        let transacaoSocia = { data: dataStr, desc: descStr, doc: docStr, valor: valorTransacaoStr, obs: "" };
-
                         let mioloUpper = miolo.toUpperCase();
-                        let isSocio = /THIAGO.*CASTRO|THIAGO.*VILHA|ANA.*VICT|ANA.*BRICE|GIOVANA/i.test(mioloUpper);
 
-                        if (isSocio) {
-                            dados.socios.push(transacaoSocia);
-                        } 
-                        else if (isDebito) {
+                        if (isDebito) {
                             if (/INTERNET|IOF|JUROS|TAR\b|CESTA|DOC\/TED|TAXA|MANUTENCAO|MENSALIDADE|TARIFA/i.test(mioloUpper)) {
                                 dados.administrativas.push(transacao);
                             } 
@@ -430,7 +419,6 @@
         updateTableData('tbl-administrativas', data.administrativas);
         updateTableData('tbl-prestadores', data.prestadores);
         updateTableData('tbl-fornecedores', data.fornecedores);
-        updateTableData('tbl-socios', data.socios);
 
         return data;
     };
@@ -453,7 +441,7 @@
         window.sincronizarDOMParaMemoria();
         const data = window.extratosPendentes.find(d => d.firebaseKey === key);
         
-        let chain = ['receitas', 'essenciais', 'administrativas', 'prestadores', 'fornecedores', 'socios'];
+        let chain = ['receitas', 'essenciais', 'administrativas', 'prestadores', 'fornecedores'];
         const catIndex = chain.indexOf(catAtual);
         const nextCatIndex = catIndex + direcao;
 
@@ -461,12 +449,6 @@
             const nextCat = chain[nextCatIndex];
             const itemRemovido = data[catAtual].splice(index, 1)[0];
             
-            if (nextCat === 'socios' && catAtual !== 'receitas') {
-                if (!itemRemovido.valor.includes('-')) itemRemovido.valor = '-' + itemRemovido.valor;
-            } else if (catAtual === 'socios' && nextCat !== 'receitas') {
-                itemRemovido.valor = itemRemovido.valor.replace('-', '');
-            }
-
             data[nextCat] = data[nextCat] || [];
             data[nextCat].push(itemRemovido);
             
@@ -506,12 +488,11 @@
 
         const sumR = (ext) => somarCategoria(ext.receitas);
         const sumD = (ext) => somarCategoria(ext.essenciais) + somarCategoria(ext.administrativas) + somarCategoria(ext.prestadores) + somarCategoria(ext.fornecedores);
-        const sumS = (ext) => somarCategoria(ext.socios);
         
-        document.getElementById('comp-total-a').innerText = "Balanço: R$ " + format(sumR(extA) - sumD(extA) + sumS(extA));
-        document.getElementById('comp-total-b').innerText = "Balanço: R$ " + format(sumR(extB) - sumD(extB) + sumS(extB));
+        document.getElementById('comp-total-a').innerText = "Balanço: R$ " + format(sumR(extA) - sumD(extA));
+        document.getElementById('comp-total-b').innerText = "Balanço: R$ " + format(sumR(extB) - sumD(extB));
 
-        const agrupar = (ext) => [...(ext.receitas||[]), ...(ext.essenciais||[]), ...(ext.administrativas||[]), ...(ext.prestadores||[]), ...(ext.fornecedores||[]), ...(ext.socios||[])];
+        const agrupar = (ext) => [...(ext.receitas||[]), ...(ext.essenciais||[]), ...(ext.administrativas||[]), ...(ext.prestadores||[]), ...(ext.fornecedores||[])];
         const todasA = agrupar(extA); const todasB = agrupar(extB);
         
         const sig = (t) => `${t.data}_${t.valor.replace('-','')}_${t.desc.substring(0,3).toLowerCase()}`;
@@ -520,10 +501,11 @@
         const faltamNoB = todasA.filter(t => !sigsB.includes(sig(t)));
         const faltamNoA = todasB.filter(t => !sigsA.includes(sig(t)));
 
-        const formataDiff = (item) => `<div class="diff-item ${!item.valor.includes('-') && (item.valor !== '') ? 'receita' : ''}"><div style="font-weight: bold;">${item.data} - ${item.desc}</div><div style="color: ${!item.valor.includes('-') ? 'var(--verde)' : 'var(--vermelho)'}; font-weight: bold; margin-top: 5px;">R$ ${item.valor}</div></div>`;
+        const isRec = (item, ext) => (ext.receitas || []).includes(item);
+        const formataDiff = (item, isReceita) => `<div class="diff-item ${isReceita ? 'receita' : ''}"><div style="font-weight: bold;">${item.data} - ${item.desc}</div><div style="color: ${isReceita ? 'var(--verde)' : 'var(--vermelho)'}; font-weight: bold; margin-top: 5px;">${isReceita ? '+' : '-'} R$ ${item.valor}</div></div>`;
 
-        document.getElementById('diff-list-a').innerHTML = faltamNoB.length > 0 ? faltamNoB.map(formataDiff).join('') : '<div style="color: green;"><i class="fa-solid fa-check"></i> Sem diferenças.</div>';
-        document.getElementById('diff-list-b').innerHTML = faltamNoA.length > 0 ? faltamNoA.map(formataDiff).join('') : '<div style="color: green;"><i class="fa-solid fa-check"></i> Sem diferenças.</div>';
+        document.getElementById('diff-list-a').innerHTML = faltamNoB.length > 0 ? faltamNoB.map(i => formataDiff(i, isRec(i, extA))).join('') : '<div style="color: green;"><i class="fa-solid fa-check"></i> Sem diferenças.</div>';
+        document.getElementById('diff-list-b').innerHTML = faltamNoA.length > 0 ? faltamNoA.map(i => formataDiff(i, isRec(i, extB))).join('') : '<div style="color: green;"><i class="fa-solid fa-check"></i> Sem diferenças.</div>';
 
         document.getElementById('compare-modal').style.display = 'block';
     };
@@ -543,33 +525,35 @@
         tempDiv.innerHTML = document.getElementById('report-template').innerHTML;
         
         tempDiv.querySelector('.tpl-mes').innerText = data.titulo;
+        
+        // Capital Social Fixo
+        tempDiv.querySelector('.tpl-capital-social').innerText = "R$ 10.000,00";
 
         const tRec = somarCategoria(data.receitas);
         const tEss = somarCategoria(data.essenciais);
         const tAdm = somarCategoria(data.administrativas);
         const tPre = somarCategoria(data.prestadores);
         const tFor = somarCategoria(data.fornecedores);
-        const tSoc = somarCategoria(data.socios);
         
         const totalDebitos = tEss + tAdm + tPre + tFor;
-        const saldoFinal = tRec - totalDebitos + tSoc;
+        const saldoFinal = tRec - totalDebitos;
 
         tempDiv.querySelectorAll('.tpl-total-receitas').forEach(el => el.innerText = format(tRec));
-        tempDiv.querySelectorAll('.tpl-total-debitos').forEach(el => el.innerText = format(totalDebitos));
+        tempDiv.querySelector('.tpl-resumo-receitas').innerText = format(tRec);
         
         tempDiv.querySelector('.tpl-total-essenciais').innerText = format(tEss);
         tempDiv.querySelector('.tpl-total-admin').innerText = format(tAdm);
         tempDiv.querySelector('.tpl-total-prestadores').innerText = format(tPre);
         tempDiv.querySelector('.tpl-total-fornecedores').innerText = format(tFor);
         
-        const tplSocEl = tempDiv.querySelector('.tpl-total-socios');
-        tplSocEl.innerText = format(tSoc);
-        if(tSoc < 0) tplSocEl.parentElement.style.color = "var(--vermelho)"; else tplSocEl.parentElement.style.color = "var(--azul-escuro)";
+        tempDiv.querySelectorAll('.tpl-total-debitos').forEach(el => el.innerText = format(totalDebitos));
+        tempDiv.querySelector('.tpl-resumo-debitos').innerText = format(totalDebitos);
         
-        const saldoFinalEl = tempDiv.querySelector('.tpl-saldo-final');
-        saldoFinalEl.innerText = format(saldoFinal);
-        if(saldoFinal < 0) saldoFinalEl.parentElement.style.color = "var(--vermelho)"; else saldoFinalEl.parentElement.style.color = "#111";
-
+        // Formata as cores para saldos negativos
+        const saldoFinalEl = tempDiv.querySelector('.tpl-resumo-saldo').parentElement;
+        tempDiv.querySelector('.tpl-resumo-saldo').innerText = format(saldoFinal);
+        if(saldoFinal < 0) saldoFinalEl.style.color = "var(--vermelho)"; else saldoFinalEl.style.color = "#111";
+        
         const firebaseKeyStr = data.firebaseKey || '';
         const buildRows = (arr, catName) => arr && arr.length > 0 ? arr.map((item, i) => `
             <tr>
@@ -589,7 +573,6 @@
         tempDiv.querySelector('#tbl-administrativas').innerHTML = buildRows(data.administrativas, 'administrativas');
         tempDiv.querySelector('#tbl-prestadores').innerHTML = buildRows(data.prestadores, 'prestadores');
         tempDiv.querySelector('#tbl-fornecedores').innerHTML = buildRows(data.fornecedores, 'fornecedores');
-        tempDiv.querySelector('#tbl-socios').innerHTML = buildRows(data.socios, 'socios');
 
         containerAlvo.appendChild(tempDiv.firstElementChild);
     }
